@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
-
+import bcrypt from "bcrypt";
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
     required: [true, "Password is required"],
     minLength: [8, "Password must contain at least 8 characters"],
     maxLength: [100, "Password cannot exceed 32 characters"],
+    select: false,
   },
   resume: {
     public_id: { type: String, default: "" },
@@ -56,5 +57,24 @@ const userSchema = new mongoose.Schema({
 });
 
 // Password hashing logic can be added as a pre-save hook here
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+userSchema.methods.comparePass = async function (enteredPass) {
+  console.log("Entered Password:", enteredPass);
+  console.log("Stored Hashed Password:", this.password);
+
+  const isMatch = await bcrypt.compare(enteredPass, this.password);
+  console.log("Password Match Result:", isMatch);
+
+  return isMatch;
+};
+
 
 export const User = mongoose.model("User", userSchema);

@@ -5,7 +5,7 @@ class ErrorHandler extends Error {
   }
 }
 
-export const ErrorMiddleware = (err, res, next) => {
+export const ErrorMiddleware = (err,req, res, next) => {
   err.message = err.message || "internal  error";
   err.statusCode = err.statusCode || 500;
 
