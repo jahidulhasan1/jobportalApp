@@ -1,14 +1,14 @@
+import mongoose from 'mongoose';
 
-import { mongoose } from 'mongoose';
-// connect db
-export const dbConnect = () =>
-  mongoose
-    .connect(process.env.MONGO_URI, {
+// Connect to MongoDB
+export const dbConnect = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
       dbName: "jobPortalDb",
-    })
-    .then(() => {
-      console.log("connected to MongoDB");
-    })
-    .catch((err) => {
-      console.log("error from db", err);
     });
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.error("Error connecting to MongoDB:", err.message);
+    process.exit(1); 
+  }
+};

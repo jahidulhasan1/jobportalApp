@@ -1,10 +1,8 @@
 import { asyncError } from "../middleware/asyncErrors.js";
 import ErrorHandler from "../middleware/errorHandle.middleware.js";
 import { User } from "../models/userSchema.models.js";
-
 import { sendToken } from "../utils/sendToken.js";
 import { handleResumeUpload } from "../helperFunctions/helperFun.userController.js";
-import bcrypt from "bcrypt";
 import cloudinary from "cloudinary";
 import {
   checkUserExists,
@@ -26,17 +24,33 @@ export const register = asyncError(async (req, res, next) => {
   } = req.body;
 
   // Validate required fields
+ 
   if (
-    !validateRequiredFields(
-      { name, email, password, role, phone, address },
+    validateRequiredFields(
+      {
+        name,
+        email,
+        password,
+        phone,
+        address,
+        coverLetter,
+        firstNiche,
+        secondNiche,
+        thirdNiche,
+       
+      },
       role,
       next
     )
-  )
+  ) {
+    console.log("lol valid");
+    
     return;
-
+  }
   // Check if the user already exists
-  if (await checkUserExists(email, next)) return;
+  if (await checkUserExists(email, next)) {
+    return;
+  }
 
   // Prepare user data
   const userData = prepareUserData({
@@ -55,14 +69,17 @@ export const register = asyncError(async (req, res, next) => {
   // Handle resume upload if provided
   if (req.files && req.files.resume) {
     const uploadResult = await handleResumeUpload(req.files.resume, next);
-    if (!uploadResult) return; // If an error occurred in file upload, it’s already handled
+    if (!uploadResult) {
+      return next(new ErrorHandler("please upload resume as job seeker"), 400);
+      return;
+    } // If an error occurred in file upload, it’s already handled
     userData.resume = uploadResult;
   }
 
   // Create the user
   const user = await User.create(userData);
 
-  sendToken(user, res, 201, "Registered successfully");
+  sendToken(user, res, 200, "Registered successfully");
 });
 
 // Helper functions

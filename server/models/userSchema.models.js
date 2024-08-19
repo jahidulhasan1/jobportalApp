@@ -11,10 +11,12 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: [true, "Phone number is required"],
-    validate: {
-      validator: (v) => validator.isMobilePhone(v),
-      message: "Please provide a valid phone number",
-    },
+    // validate: {
+    //   validator: function (v) {
+    //     return validator.isMobilePhone(v, 'any', { strictMode: true });
+    //   },
+    //   message: "Please provide a valid phone number.",
+    // }
   },
   email: {
     type: String,
@@ -34,7 +36,7 @@ const userSchema = new mongoose.Schema({
   },
   coverLetter: {
     type: String,
-    default: "",
+    
   },
   niches: {
     firstNiche: { type: String, default: "" },
@@ -71,7 +73,7 @@ userSchema.methods.comparePass = async function (enteredPass) {
   console.log("Stored Hashed Password:", this.password);
 
   const isMatch = await bcrypt.compare(enteredPass, this.password);
-  console.log("Password Match Result:", isMatch);
+
 
   return isMatch;
 };

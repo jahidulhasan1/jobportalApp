@@ -1,11 +1,23 @@
 import { v2 as cloudinary } from "cloudinary";
+import ErrorHandler from "../middleware/errorHandle.middleware.js";
+import { User } from "../models/userSchema.models.js";
 
 export const validateRequiredFields = (fields, role, next) => {
-  const { name, email, password, phone, address } = fields;
-  if (!name || !email || !password || !role || !phone || !address) {
+  const { name, email, password, phone, address, coverLetter } = fields; // Debug log
+
+  if (
+    !name ||
+    !email ||
+    !password ||
+    !role ||
+    !phone ||
+    !address ||
+    !coverLetter
+  ) {
     next(new ErrorHandler("All fields must be filled", 400));
-    return false;
+    return true; // Validation failed
   }
+
   if (
     role === "job seeker" &&
     (!fields.firstNiche || !fields.secondNiche || !fields.thirdNiche)
@@ -13,9 +25,9 @@ export const validateRequiredFields = (fields, role, next) => {
     next(
       new ErrorHandler("Please provide all three preferred job niches", 400)
     );
-    return false;
+    return true; // Validation failed
   }
-  return true;
+  return false; // Validation passed
 };
 
 export const checkUserExists = async (email, next) => {

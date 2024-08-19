@@ -8,7 +8,9 @@ export const isAuthenticated = asyncError(async (req, res, next) => {
   const { token } = req.cookies;
 
   if (!token) {
-    return next(new ErrorHandler("user is not authorized and authenticated", 401));
+    return next(
+      new ErrorHandler("user is not authorized and authenticated", 401)
+    );
   }
 
   // Verify the token
@@ -28,3 +30,17 @@ export const isAuthenticated = asyncError(async (req, res, next) => {
   // Move to the next middleware or route handler
   next();
 });
+
+export const isAuthorized = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorHandler(
+          `${req.user.role} not allowed to access this recourse`,
+          400
+        )
+      );
+    }
+    next();
+  };
+};
