@@ -9,7 +9,8 @@ import jobRouter from "./routes/job.routes.js";
 import fileUpload from "express-fileupload";
 import userRouter from "./routes/user.routes.js";
 import applicationRouter from "./routes/application.routes.js";
-import { postApplication } from "./controller/application.controller.js";
+
+import { newsLetterCron } from "./automation/newsLetterCorn.js";
 const app = express();
 
 config({ path: "./config/.env" });
@@ -33,6 +34,7 @@ app.use(
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/job", jobRouter);
 app.use("/api/v1/application", applicationRouter);
+newsLetterCron();
 dbConnect();
 
 app.get("/", (req, res) => {
